@@ -26,6 +26,16 @@ JS_FILES += ${IHP}/static/vendor/morphdom-umd.min.js
 JS_FILES += ${IHP}/static/vendor/turbolinks.js
 JS_FILES += ${IHP}/static/vendor/turbolinksInstantClick.js
 JS_FILES += ${IHP}/static/vendor/turbolinksMorphdom.js
+JS_FILES += static/app.js
 
 include ${IHP}/Makefile.dist
 
+Frontend/node_modules:
+	cd Frontend && npm install
+
+static/app.js: Frontend/node_modules Frontend/app.ts
+	cd Frontend && ./node_modules/.bin/esbuild app.ts --bundle --outfile=../static/app.js ${ESBUILD_FLAGS}
+
+watch-frontend:
+	touch Frontend/app.ts # Force rebuild
+	$(MAKE) static/app.js ESBUILD_FLAGS="--watch"

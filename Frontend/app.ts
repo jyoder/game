@@ -1,8 +1,24 @@
-function startApp() {
-    console.log("hello world");
-}
+import * as Phaser from 'phaser';
 
-document.addEventListener('ready turbolinks:load', function () {
-    // This is called on the first page load *and* also when the page is changed by turbolinks
-    startApp();
-});
+const gameConfig: Phaser.Types.Core.GameConfig = {
+  title: 'Sample',
+ 
+  type: Phaser.AUTO,
+ 
+  scale: {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  },
+ 
+  physics: {
+    default: 'arcade',
+    arcade: {
+      debug: true,
+    },
+  },
+ 
+  parent: 'game',
+  backgroundColor: '#000000',
+};
+ 
+export const game = new Phaser.Game(gameConfig);

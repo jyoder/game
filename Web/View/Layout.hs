@@ -21,10 +21,7 @@ defaultLayout inner = H.docTypeHtml ! A.lang "en" $ [hsx|
     <title>{pageTitleOrDefault "App"}</title>
 </head>
 <body>
-    <div class="container mt-4">
-        {renderFlashMessages}
-        {inner}
-    </div>
+    {inner}
 </body>
 |]
 

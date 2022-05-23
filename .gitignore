@@ -17,6 +17,7 @@ gen
 del
 static/prod.*
 Config/client_session_key.aes
+static/app.js
 
 # Ignore locally checked out IHP version
 IHP

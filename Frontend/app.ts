@@ -1,4 +1,4 @@
-import { Actor, CollisionType, Color, Engine, vec } from "excalibur";
+import { Actor, CollisionType, Color, Engine, vec, DisplayMode, ImageSource, Animation, AnimationStrategy, Loader } from "excalibur";
 
 document.addEventListener('turbolinks:load', function () {
   run();
@@ -7,43 +7,89 @@ document.addEventListener('turbolinks:load', function () {
 function run() {
   // game.js
 
-  // start-snippet{create-engine}
+  const boyStanding00 = new ImageSource('boy-standing-00.png');
+  const boyWalking00 = new ImageSource('boy-walking-00.png');
+  const boyWalking01 = new ImageSource('boy-walking-01.png');
+  const loader = new Loader([boyStanding00, boyWalking00, boyWalking01]);
+
+
+  const boyStanding = new Animation({
+    frames: [
+      {
+        graphic: boyStanding00.toSprite(),
+        duration: 300,
+      },
+    ],
+  });
+
+  const boyWalking = new Animation({
+    frames: [
+      {
+        graphic: boyWalking00.toSprite(),
+        duration: 100,
+      },
+      {
+        graphic: boyWalking01.toSprite(),
+        duration: 100,
+      },
+    ],
+    strategy: AnimationStrategy.Loop
+  });
+
+    // start-snippet{create-engine}
   // Create an instance of the engine.
   // I'm specifying that the game be 800 pixels wide by 600 pixels tall.
   // If no dimensions are specified the game will fit to the screen.
   const game = new Engine({
-    width: 800,
-    height: 600,
+    displayMode: DisplayMode.FillScreen,
+    backgroundColor: Color.White
   });
   // end-snippet{create-engine}
 
-  // start-snippet{create-paddle}
+  // start-snippet{create-player}
   // Create an actor with x position of 150px,
   // y position of 40px from the bottom of the screen,
   // width of 200px, height and a height of 20px
-  const paddle = new Actor({
+  const player = new Actor({
     x: 150,
-    y: game.drawHeight - 40,
-    width: 200,
-    height: 20,
-    // Let's give it some color with one of the predefined
-    // color constants
-    color: Color.Chartreuse,
+    y: game.drawHeight - 100,
+    width: 50,
+    height: 50,
+    color: undefined,
   });
+  player.graphics.use(boyStanding);
 
-  // Make sure the paddle can partipate in collisions, by default excalibur actors do not collide with each other
+  // Make sure the player can partipate in collisions, by default excalibur actors do not collide with each other
   // CollisionType.Fixed is like an object with infinite mass, and cannot be moved, but does participate in collision.
-  paddle.body.collisionType = CollisionType.Fixed;
+  player.body.collisionType = CollisionType.Fixed;
 
   // `game.add` is the same as calling
   // `game.currentScene.add`
-  game.add(paddle);
-  // end-snippet{create-paddle}
+  game.add(player);
+  // end-snippet{create-player}
+
+  game.currentScene.camera.strategy.lockToActor(player);
 
   // start-snippet{mouse-move}
   // Add a mouse move listener
-  game.input.pointers.primary.on("move", (evt) => {
-    paddle.pos.x = evt.worldPos.x;
+  game.input.keyboard.on('hold', (event) => {
+    if(event.key === 'ArrowLeft') {
+      player.pos.x -= 3;
+      player.graphics.use(boyWalking);
+    } else if(event.key === 'ArrowRight') {
+      player.pos.x += 3;
+      player.graphics.use(boyWalking);
+    } else if(event.key === 'ArrowUp') {
+      player.pos.y -= 3;
+      player.graphics.use(boyWalking);
+    } else if(event.key === 'ArrowDown') {
+      player.pos.y += 3;
+      player.graphics.use(boyWalking);
+    }
+  });
+
+  game.input.keyboard.on('release', () => {
+    player.graphics.use(boyStanding);
   });
   // end-snippet{mouse-move}
 
@@ -176,13 +222,13 @@ function run() {
 
   // start-snippet{lose-condition}
   // Loss condition
-  ball.on("exitviewport", () => {
-    alert("You lose!");
-  });
+  // ball.on("exitviewport", () => {
+  //   alert("You lose!");
+  // });
   // end-snippet{lose-condition}
 
   // start-snippet{start-game}
   // Start the engine to begin the game.
-  game.start();
+  game.start(loader);
   // end-snippet{start-game}
 }

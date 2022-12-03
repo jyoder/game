@@ -9,6 +9,8 @@ import {
   Animation,
   AnimationStrategy,
   Loader,
+  SpriteSheet,
+  Vector,
 } from "excalibur";
 
 document.addEventListener("turbolinks:load", function () {
@@ -18,31 +20,84 @@ document.addEventListener("turbolinks:load", function () {
 function run() {
   // game.js
 
-  const boyStanding00 = new ImageSource("boy-standing-00.png");
-  const boyWalking00 = new ImageSource("boy-walking-00.png");
-  const boyWalking01 = new ImageSource("boy-walking-01.png");
-  const loader = new Loader([boyStanding00, boyWalking00, boyWalking01]);
+  const sluggyIdleImage = new ImageSource("sluggy-idle.png");
+  const sluggyWalkingImage = new ImageSource("sluggy-walking.png");
+  const sluggyJumpingImage = new ImageSource("sluggy-jumping.png");
+  const loader = new Loader([
+    sluggyIdleImage,
+    sluggyWalkingImage,
+    sluggyJumpingImage,
+  ]);
 
-  const boyStanding = new Animation({
-    frames: [
-      {
-        graphic: boyStanding00.toSprite(),
-        duration: 300,
-      },
-    ],
+  const sluggyIdleSpriteSheet = SpriteSheet.fromImageSource({
+    image: sluggyIdleImage,
+    grid: {
+      rows: 4,
+      columns: 4,
+      spriteWidth: 32,
+      spriteHeight: 32,
+    },
   });
 
-  const boyWalking = new Animation({
-    frames: [
-      {
-        graphic: boyWalking00.toSprite(),
-        duration: 100,
-      },
-      {
-        graphic: boyWalking01.toSprite(),
-        duration: 100,
-      },
-    ],
+  const sluggyWalkingSpriteSheet = SpriteSheet.fromImageSource({
+    image: sluggyWalkingImage,
+    grid: {
+      rows: 3,
+      columns: 3,
+      spriteWidth: 32,
+      spriteHeight: 32,
+    },
+  });
+
+  const sluggyIdleRight = new Animation({
+    frames: sluggyIdleSpriteSheet.sprites.map((sprite) => {
+      const s = sprite.clone();
+      s.scale = new Vector(2.5, 2.5);
+      return {
+        graphic: s,
+        duration: 200,
+      };
+    }),
+  });
+
+  const sluggyIdleLeft = new Animation({
+    frames: sluggyIdleSpriteSheet.sprites.map((sprite) => {
+      const s = sprite.clone();
+      s.scale = new Vector(2.5, 2.5);
+      s.flipHorizontal = true;
+      return {
+        graphic: s,
+        duration: 200,
+      };
+    }),
+  });
+
+  const sluggyWalkingRight = new Animation({
+    frames: sluggyWalkingSpriteSheet.sprites
+      .map((sprite) => {
+        const s = sprite.clone();
+        s.scale = new Vector(2.5, 2.5);
+        return {
+          graphic: s,
+          duration: 200,
+        };
+      })
+      .slice(0, -2),
+    strategy: AnimationStrategy.Loop,
+  });
+
+  const sluggyWalkingLeft = new Animation({
+    frames: sluggyWalkingSpriteSheet.sprites
+      .map((sprite) => {
+        const s = sprite.clone();
+        s.scale = new Vector(2.5, 2.5);
+        s.flipHorizontal = true;
+        return {
+          graphic: s,
+          duration: 200,
+        };
+      })
+      .slice(0, -2),
     strategy: AnimationStrategy.Loop,
   });
 
@@ -67,7 +122,7 @@ function run() {
     height: 50,
     color: undefined,
   });
-  player.graphics.use(boyStanding);
+  player.graphics.use(sluggyIdleRight);
 
   // Make sure the player can partipate in collisions, by default excalibur actors do not collide with each other
   // CollisionType.Fixed is like an object with infinite mass, and cannot be moved, but does participate in collision.
@@ -85,21 +140,19 @@ function run() {
   game.input.keyboard.on("hold", (event) => {
     if (event.key === "ArrowLeft") {
       player.pos.x -= 3;
-      player.graphics.use(boyWalking);
+      player.graphics.use(sluggyWalkingLeft);
     } else if (event.key === "ArrowRight") {
       player.pos.x += 3;
-      player.graphics.use(boyWalking);
-    } else if (event.key === "ArrowUp") {
-      player.pos.y -= 3;
-      player.graphics.use(boyWalking);
-    } else if (event.key === "ArrowDown") {
-      player.pos.y += 3;
-      player.graphics.use(boyWalking);
+      player.graphics.use(sluggyWalkingRight);
     }
   });
 
-  game.input.keyboard.on("release", () => {
-    player.graphics.use(boyStanding);
+  game.input.keyboard.on("release", (event) => {
+    if (event.key === "ArrowLeft") {
+      player.graphics.use(sluggyIdleLeft);
+    } else if (event.key === "ArrowRight") {
+      player.graphics.use(sluggyIdleRight);
+    }
   });
   // end-snippet{mouse-move}
 

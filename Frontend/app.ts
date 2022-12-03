@@ -1,17 +1,27 @@
-import { Actor, CollisionType, Color, Engine, vec, DisplayMode, ImageSource, Animation, AnimationStrategy, Loader } from "excalibur";
+import {
+  Actor,
+  CollisionType,
+  Color,
+  Engine,
+  vec,
+  DisplayMode,
+  ImageSource,
+  Animation,
+  AnimationStrategy,
+  Loader,
+} from "excalibur";
 
-document.addEventListener('turbolinks:load', function () {
+document.addEventListener("turbolinks:load", function () {
   run();
 });
 
 function run() {
   // game.js
 
-  const boyStanding00 = new ImageSource('boy-standing-00.png');
-  const boyWalking00 = new ImageSource('boy-walking-00.png');
-  const boyWalking01 = new ImageSource('boy-walking-01.png');
+  const boyStanding00 = new ImageSource("boy-standing-00.png");
+  const boyWalking00 = new ImageSource("boy-walking-00.png");
+  const boyWalking01 = new ImageSource("boy-walking-01.png");
   const loader = new Loader([boyStanding00, boyWalking00, boyWalking01]);
-
 
   const boyStanding = new Animation({
     frames: [
@@ -33,16 +43,16 @@ function run() {
         duration: 100,
       },
     ],
-    strategy: AnimationStrategy.Loop
+    strategy: AnimationStrategy.Loop,
   });
 
-    // start-snippet{create-engine}
+  // start-snippet{create-engine}
   // Create an instance of the engine.
   // I'm specifying that the game be 800 pixels wide by 600 pixels tall.
   // If no dimensions are specified the game will fit to the screen.
   const game = new Engine({
     displayMode: DisplayMode.FillScreen,
-    backgroundColor: Color.White
+    backgroundColor: Color.White,
   });
   // end-snippet{create-engine}
 
@@ -72,23 +82,23 @@ function run() {
 
   // start-snippet{mouse-move}
   // Add a mouse move listener
-  game.input.keyboard.on('hold', (event) => {
-    if(event.key === 'ArrowLeft') {
+  game.input.keyboard.on("hold", (event) => {
+    if (event.key === "ArrowLeft") {
       player.pos.x -= 3;
       player.graphics.use(boyWalking);
-    } else if(event.key === 'ArrowRight') {
+    } else if (event.key === "ArrowRight") {
       player.pos.x += 3;
       player.graphics.use(boyWalking);
-    } else if(event.key === 'ArrowUp') {
+    } else if (event.key === "ArrowUp") {
       player.pos.y -= 3;
       player.graphics.use(boyWalking);
-    } else if(event.key === 'ArrowDown') {
+    } else if (event.key === "ArrowDown") {
       player.pos.y += 3;
       player.graphics.use(boyWalking);
     }
   });
 
-  game.input.keyboard.on('release', () => {
+  game.input.keyboard.on("release", () => {
     player.graphics.use(boyStanding);
   });
   // end-snippet{mouse-move}
